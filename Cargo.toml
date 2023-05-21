@@ -17,6 +17,10 @@ edition = "2018"
 name = "should_panic"
 harness = false
 
+[[test]]
+name = "stack_overflow"
+harness = false
+
 [dependencies]
 x86_64 = "0.14.2"
 uart_16550 = "0.2.0"
