@@ -137,10 +137,14 @@ macro_rules! println {
   ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
 }
 
+// Prints a formatted string to the VGA text buffer
 #[doc(hidden)]
 pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
-    WRITER.lock().write_fmt(args).unwrap()
+    use x86_64::instructions::interrupts;
+
+    // Fix print deadlock
+    interrupts::without_interrupts(|| WRITER.lock().write_fmt(args).unwrap());
 }
 
 #[test_case]
@@ -157,12 +161,23 @@ fn test_println_many() {
 
 #[test_case]
 fn test_println_output() {
+    use core::fmt::Write;
+    use x86_64::instructions::interrupts;
+
     let s = "Something to write to the screen";
-    println!("{}", s);
-    for (i, c) in s.chars().enumerate() {
-        let screenchar = WRITER.lock().buffer.chars[BUFFER_HEIGHT - 2][i].read();
-        assert_eq!(char::from(screenchar.ascii_character), c);
-    }
+    // Avoid deadlocks by disabling interrupts
+    interrupts::without_interrupts(|| {
+        // Explicitly lock writer and use it for duration of test
+        let mut writer = WRITER.lock();
+
+        // Use newline in case of unexpected output before test
+        writeln!(writer, "\n{}", s).expect("writeln failed");
+
+        for (i, c) in s.chars().enumerate() {
+            let screenchar = writer.buffer.chars[BUFFER_HEIGHT - 2][i].read();
+            assert_eq!(char::from(screenchar.ascii_character), c);
+        }
+    })
 }
 
 // pub fn print_something() {

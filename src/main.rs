@@ -13,23 +13,18 @@ pub extern "C" fn _start() -> ! {
 
     blog_os::init();
 
-    fn stack_overflow() {
-        stack_overflow();
-    }
-
-    stack_overflow();
-
     #[cfg(test)]
     test_main();
 
-    loop {}
+    println!("It did not crash!");
+    blog_os::hlt_loop();
 }
 
 #[cfg(not(test))]
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     println!("{}", _info);
-    loop {}
+    blog_os::hlt_loop();
 }
 
 #[cfg(test)]
