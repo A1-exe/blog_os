@@ -11,6 +11,9 @@ pub mod memory;
 pub mod serial;
 pub mod vga_buffer;
 
+extern crate alloc;
+pub mod allocator;
+
 use core::panic::PanicInfo;
 
 pub trait Testable {
