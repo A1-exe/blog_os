@@ -66,3 +66,17 @@ fn many_boxes() {
         assert_eq!(*x, i);
     }
 }
+
+/// This test functions similar to many_boxes, but it begins with one `long_lived`
+/// allocation that is corrupted when the allocator does not reuse freed memory.
+///
+/// Leads to an out-of-memory error in bump allocator.
+#[test_case]
+fn many_boxes_long_lived() {
+    let long_lived = Box::new(1);
+    for i in 0..HEAP_SIZE {
+        let x = Box::new(i);
+        assert_eq!(*x, i);
+    }
+    assert_eq!(*long_lived, 1);
+}
