@@ -22,9 +22,9 @@ name = "stack_overflow"
 harness = false
 
 [dependencies]
-x86_64 = "0.14.2"
+x86_64 = "0.15.2"
 uart_16550 = "0.2.0"
-bootloader = { version = "0.9.23", features = ["map_physical_memory"] }
+bootloader = { version = "0.9.33", features = ["map_physical_memory"] }
 lazy_static = { version = "1.0", features = ["spin_no_std"] }
 spin = "0.5.2"
 volatile = "0.2.6"
